@@ -2,7 +2,7 @@ trigger:
 - main  # Pipeline triggers on changes in the main branch
 
 pool:
-  vmImage: 'windows-latest'  # Use a Windows-based agent
+  vmImage: 'windows-latest'  # Windows-based agent for SqlPackage utility
 
 variables:
   sqlServerInstance: 'SWG_APXUPEG1GUJ\SQLEXPRESS'  # Local SQL Server instance
@@ -12,20 +12,16 @@ variables:
   sqlPassword: 'Aksh@123'                # SQL Server password
 
 steps:
-# Step 1: Download and Install SqlPackage Utility
-- script: |
-    echo "Downloading SqlPackage..."
-    Invoke-WebRequest -Uri "https://aka.ms/sqlpackage-windows" -OutFile "sqlpackage.zip"
-    echo "Extracting SqlPackage..."
-    Expand-Archive -Path "sqlpackage.zip" -DestinationPath "$(Build.SourcesDirectory)/sqlpackage"
-    echo "SqlPackage downloaded and extracted."
-  displayName: 'Download and Install SqlPackage'
+# Step 1: Install SqlPackage (Optional: For self-hosted agents, ensure it's pre-installed)
+- task: UseDotNet@2
+  inputs:
+    packageType: 'sdk'
+    version: '9.x'  # Ensures .NET runtime support for SqlPackage
 
 # Step 2: Export BACPAC using SqlPackage
 - script: |
     echo "Starting BACPAC export for database: $(databaseName)"
-    "$(Build.SourcesDirectory)/sqlpackage/sqlpackage/SqlPackage.exe" /Action:Export `
-                   /SourceServerName:"$(sqlServerInstance)" `
+    SqlPackage.exe /Action:Export /SourceServerName:"$(sqlServerInstance)" `
                    /SourceDatabaseName:"$(databaseName)" `
                    /TargetFile:"$(bacpacPath)" `
                    /SourceUser:"$(sqlUsername)" `
