@@ -15,8 +15,9 @@ variables:
 steps:
 # Step 1: Export BACPAC using SqlPackage
 - script: |
-    set PATH=C:\SQL\sqlpackage;%PATH%
-    SqlPackage.exe /Action:Export `
+    echo "Starting BACPAC export for database: $(databaseName)"
+    "C:\SQL\sqlpackage\SqlPackage.exe"` 
+                   /Action:Export `
                    /SourceServerName:"$(sqlServerInstance)" `
                    /SourceDatabaseName:"$(databaseName)" `
                    /TargetFile:"$(bacpacPath)" `
