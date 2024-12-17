@@ -16,7 +16,6 @@ steps:
 # Step 1: Export BACPAC using SqlPackage
 - script: |
     set PATH=C:\SQL\sqlpackage;%PATH%
-    echo "Updated PATH: %PATH%"
     SqlPackage.exe /Action:Export `
                    /SourceServerName:"$(sqlServerInstance)" `
                    /SourceDatabaseName:"$(databaseName)" `
