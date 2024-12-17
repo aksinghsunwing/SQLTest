@@ -17,7 +17,7 @@ steps:
 - script: |
     echo "Current PATH: %PATH%
     echo "Starting BACPAC export for database: $(databaseName)"
-    "C:\SQL\sqlpackage\SqlPackage.exe"`
+    "C:\SQL\sqlpackage\sqlpackage.exe"`
                    /Action:Export` 
                    /SourceServerName:"$(sqlServerInstance)" `
                    /SourceDatabaseName:"$(databaseName)" `
