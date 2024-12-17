@@ -1,0 +1,37 @@
+trigger:
+- main  # Pipeline triggers on changes in the main branch
+
+pool:
+  vmImage: 'windows-latest'  # Windows-based agent for SqlPackage utility
+
+variables:
+  sqlServerInstance: 'SWG_APXUPEG1GUJ\SQLEXPRESS'  # Local SQL Server instance
+  databaseName: 'Jarvis'                          # Database to export
+  bacpacPath: '$(Build.ArtifactStagingDirectory)/Jarvis.bacpac'  # Output path for bacpac file
+  sqlUsername: 'sa'                # SQL Server username
+  sqlPassword: 'Aksh@123'                # SQL Server password
+
+steps:
+# Step 1: Install SqlPackage (Optional: For self-hosted agents, ensure it's pre-installed)
+- task: UseDotNet@2
+  inputs:
+    packageType: 'sdk'
+    version: '6.x'  # Ensures .NET runtime support for SqlPackage
+
+# Step 2: Export BACPAC using SqlPackage
+- script: |
+    echo "Starting BACPAC export for database: $(databaseName)"
+    SqlPackage.exe /Action:Export /SourceServerName:"$(sqlServerInstance)" `
+                   /SourceDatabaseName:"$(databaseName)" `
+                   /TargetFile:"$(bacpacPath)" `
+                   /SourceUser:"$(sqlUsername)" `
+                   /SourcePassword:"$(sqlPassword)"
+  displayName: 'Export Database to BACPAC'
+
+# Step 3: Publish the BACPAC as a pipeline artifact
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'BACPAC'
+    publishLocation: 'Container'
+  displayName: 'Publish BACPAC File'
